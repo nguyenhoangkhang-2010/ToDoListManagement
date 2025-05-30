@@ -248,7 +248,7 @@ class BuildCrud (JSONHandler):
         tree.pack(fill="both", expand=True, padx=10, pady=10)
 
         for idx, task in enumerate(data):
-            status = "✅ Hoàn thành" if task.get("done") else "❌ Chưa hoàn thành"
+            status = "Hoàn thành" if task.get("done") else "Chưa hoàn thành"
             tree.insert("", "end", iid=idx, values=(
                 task.get("title", ""),
                 task.get("description", ""),
