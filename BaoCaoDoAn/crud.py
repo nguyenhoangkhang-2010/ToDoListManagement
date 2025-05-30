@@ -314,13 +314,3 @@ class BuildCrud (JSONHandler):
 
         except Exception as e:
             messagebox.showerror("Lỗi", f"Lỗi khi lấy API Todoist:\n{e}")
-
-
-    def check_data_exists(self):
-        data = self.load_data()
-        if data:
-            messagebox.showinfo("Kiểm tra dữ liệu", "File JSON đã có dữ liệu.")
-            return True
-        else:
-            messagebox.showinfo("Kiểm tra dữ liệu", "File JSON chưa có dữ liệu.")
-            return False
