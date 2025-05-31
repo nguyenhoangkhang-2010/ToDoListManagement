@@ -10,7 +10,6 @@ class JSONHandler:
             username = self.current_user
         return f"data_{username}.json"
 
-
     def load_data(self):
         filename = self.get_data_file()
         if not os.path.exists(filename):
