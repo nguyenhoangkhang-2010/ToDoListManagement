@@ -6,6 +6,8 @@ from jsonhandle import JSONHandler
 from auth_manager import AuthManager
 import requests
 from todoist_api_python.api import TodoistAPI
+from tkcalendar import Calendar
+from datetime import date
 
 class BuildCrud (JSONHandler):
     def __init__(self, username, role):
@@ -64,7 +66,7 @@ class BuildCrud (JSONHandler):
         def save_new_task():
             title = entry_title.get()
             description = text_desc.get("1.0", tk.END).strip()
-            deadline = entry_deadline.get()
+            deadline = calendar.get_date()
             done = done_var.get()  
 
             if not title or not deadline:
@@ -75,7 +77,6 @@ class BuildCrud (JSONHandler):
                 "title": title,
                 "description": description,
                 "deadline": deadline,
-                "priority": "",
                 "done": done
             }
 
@@ -87,7 +88,7 @@ class BuildCrud (JSONHandler):
 
         window_create = tk.Toplevel()
         window_create.title("Tạo công việc mới")
-        window_create.geometry("400x350")
+        window_create.geometry("400x450")
 
         tk.Label(window_create, text="Tên công việc:").pack()
         entry_title = tk.Entry(window_create)
@@ -97,9 +98,9 @@ class BuildCrud (JSONHandler):
         text_desc = tk.Text(window_create, height=5)
         text_desc.pack(fill="x", padx=10)
 
-        tk.Label(window_create, text="Hạn chót (YYYY-MM-DD):").pack()
-        entry_deadline = tk.Entry(window_create)
-        entry_deadline.pack(fill="x", padx=10)
+        tk.Label(window_create, text="Hạn chót (DD-MM-YYYY):").pack()
+        calendar = Calendar(window_create, selectmode='day', mindate=date.today(), date_pattern="dd-mm-yyyy", showothermonthdays=False)
+        calendar.pack(pady=5)
 
         done_var = tk.BooleanVar()
         tk.Checkbutton(window_create, text="Đã hoàn thành", variable=done_var).pack(pady=5)
@@ -158,7 +159,7 @@ class BuildCrud (JSONHandler):
         tree.pack(fill="both", expand=True, padx=10, pady=10)
 
         for idx, task in enumerate(data):
-            status = "✅ Hoàn thành" if task.get("done") else "❌ Chưa hoàn thành"
+            status = "Hoàn thành" if task.get("done") else "Chưa hoàn thành"
             tree.insert("", "end", iid=idx, values=(
                 task.get("title", ""),
                 task.get("description", ""),
@@ -293,7 +294,14 @@ class BuildCrud (JSONHandler):
             new_tasks = []
             for task in todoist_tasks:
                 title = task.get("content", "")
-                deadline = task.get("due", {}).get("date", "")
+                deadline_raw = task.get("due", {}).get("date", "")
+                deadline = ""
+                if deadline_raw:
+                    try:
+                        deadline = date.fromisoformat(deadline_raw).strftime("%d-%m-%Y")
+                    except ValueError:
+                        deadline = deadline_raw
+
                 task_key = (title, deadline)
 
                 if task_key not in existing_task_keys:

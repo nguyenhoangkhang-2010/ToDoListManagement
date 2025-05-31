@@ -7,12 +7,6 @@ import hashlib
 
 class AuthManager:
     USERS_FILE = "users.json"
-
-# ======= QUẢN LÝ USER ===========
-    def __init__(self):
-        self.current_users = None
-        self.current_role = None
-
     def load_users(self):
         if not os.path.exists(self.USERS_FILE):
             return {}

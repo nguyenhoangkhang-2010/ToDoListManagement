@@ -5,10 +5,6 @@ from auth_manager import AuthManager
 from tkinter import messagebox, ttk
 
 class JSONHandler:
-    def __init__(self, username= None, role = None):
-        self.current_user = username
-        self.current_role = role
-    
     def get_data_file(self, username=None):
         if username is None:
             username = self.current_user

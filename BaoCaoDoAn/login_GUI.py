@@ -86,29 +86,24 @@ class LoginGUI:
         root.geometry("500x650")
         root.config(bg="lightblue")
 
-        # Style
         style = ttk.Style()
         style.configure("TButton", font=("Arial", 12), padding=10)
 
         # Tiêu đề
         tk.Label(root, text="Quản Lý Thông Tin", font=("Arial", 16, "bold"), bg="lightblue").pack(pady=20)
 
-        # CRUD Buttons (theo quyền)
         # Cả admin và user đều có quyền đọc
         ttk.Button(root, text="Tạo Mới", command=user_crud.create_data).pack(fill="x", padx=20, pady=5)
         ttk.Button(root, text="Cập Nhật", command=user_crud.update_data).pack(fill="x", padx=20, pady=5)
         ttk.Button(root, text="Xóa", command=user_crud.delete_data).pack(fill="x", padx=20, pady=5)
         ttk.Button(root, text="Đọc Dữ Liệu", command=user_crud.read_data).pack(fill="x", padx=20, pady=5)
 
-        # Nút cho admin xem danh sách user
         if role == "admin":
             ttk.Button(root, text="Xem Tài Khoản", command=user_crud.show_user_list).pack(fill="x", padx=20, pady=5)
             ttk.Button(root, text="Xem Công Việc Người Dùng", command=user_crud.admin_view_tasks).pack(fill="x", padx=20, pady=5)
 
-        # Nút lấy dữ liệu từ API
         ttk.Button(root, text="Lấy dữ liệu từ API", command=user_crud.fetch_data_from_api).pack(fill="x", padx=20, pady=5)
         
-        # Nút kiểm tra dữ liệu trong file JSON
         ttk.Button(root, text="Kiểm tra dữ liệu JSON", command=user_crud.check_data_exists).pack(fill="x", padx=20, pady=5)
 
         root.mainloop()
