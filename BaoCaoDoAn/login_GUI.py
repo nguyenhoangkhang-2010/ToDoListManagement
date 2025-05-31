@@ -190,6 +190,5 @@ class LoginGUI:
 
     def hash_password(self, password):
         if len(password) < 6:
-            messagebox.showwarning("Yếu", "Mật khẩu phải có ít nhất 6 ký tự!")
             return None
         return hashlib.sha256(password.encode()).hexdigest()
