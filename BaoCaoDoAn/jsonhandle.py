@@ -1,8 +1,6 @@
-import tkinter as tk
 import json
 import os
 from auth_manager import AuthManager
-from tkinter import messagebox, ttk
 
 class JSONHandler:
     def get_data_file(self, username=None):

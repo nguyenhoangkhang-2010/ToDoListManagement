@@ -1,9 +1,5 @@
 import json
-import tkinter as tk
 import os
-from tkinter import messagebox
-from tkinter import *
-import hashlib
 
 class AuthManager:
     USERS_FILE = "users.json"
