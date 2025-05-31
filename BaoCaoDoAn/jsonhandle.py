@@ -1,6 +1,5 @@
 import json
 import os
-from auth_manager import AuthManager
 
 class JSONHandler:
     def get_data_file(self, username=None):
