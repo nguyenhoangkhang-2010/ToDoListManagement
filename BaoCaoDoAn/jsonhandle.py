@@ -15,7 +15,6 @@ class JSONHandler:
             return json.load(f)
 
     def save_data(self, data):
-        global current_user
         filename = self.get_data_file()
         with open(filename, "w", encoding= "utf-8") as f:
             json.dump(data, f, indent=4)
