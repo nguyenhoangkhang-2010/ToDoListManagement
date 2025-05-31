@@ -11,7 +11,6 @@ from datetime import date
 
 class BuildCrud (JSONHandler):
     def __init__(self, username, role):
-        super().__init__()
         self.current_user = username
         self.current_role = role
         self.auth = AuthManager()
