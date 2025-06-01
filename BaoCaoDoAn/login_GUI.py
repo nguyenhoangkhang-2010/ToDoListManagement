@@ -3,7 +3,7 @@ from tkinter import messagebox, ttk
 from auth_manager import AuthManager
 from crud import BuildCrud
 from jsonhandle import JSONHandler
-from tkinter import *
+from tkinter import PhotoImage
 import hashlib
 
 class LoginGUI:
