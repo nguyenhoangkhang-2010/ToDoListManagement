@@ -33,7 +33,11 @@ class GetApi:
 
             existing_data = self.load_data()
             # Phải so sánh thêm assigned_to để tránh trùng task giữa các user
-            existing_task_keys = set((task.get("title"), task.get("deadline"), task.get("assigned_to")) for task in existing_data)
+            existing_task_keys = set(
+                (task.get("title"), task.get("deadline"), tuple(task.get("assigned_to")) if isinstance(task.get("assigned_to"), list) else task.get("assigned_to"))
+                for task in existing_data
+            )
+
 
             new_tasks = []
             for task in todoist_tasks:

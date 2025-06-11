@@ -17,9 +17,6 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
         self.display_frame = None
         self.auth = AuthManager()
 
-    def load_data(self):
-        return GetApi.load_data(self)
-
     def set_display_frame(self, parent_frame):
         # Frame tìm kiếm
         self.search_frame = tk.Frame(parent_frame, bg="white")
