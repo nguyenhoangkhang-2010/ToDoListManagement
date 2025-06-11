@@ -318,6 +318,14 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
             return
 
         data = self.normalize_tasks(data)
+
+        # Nếu là admin, xem được toàn bộ công việc
+        if self.current_role == "admin":
+            self.clear_display()
+            self.show_task_list(data)
+            return
+
+        # Nếu là user, chỉ xem được công việc được phân công cho mình
         current_user = self.current_user.strip()
         filtered_data = []
 
@@ -331,15 +339,14 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
             if current_user in assigned_to:
                 filtered_data.append(task)
 
-        data = filtered_data
-        print(f"Công việc được phân cho '{self.current_user}':", len(data))
+        print(f"Công việc được phân cho '{self.current_user}':", len(filtered_data))
 
-        if not data:
+        if not filtered_data:
             messagebox.showinfo("Thông báo", "Bạn chưa được phân công công việc nào.")
             return
 
         self.clear_display()
-        self.show_task_list(data)
+        self.show_task_list(filtered_data)
 
     def update_data(self):
         data = self.load_data()
@@ -379,7 +386,12 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
                 assigned = []
             return assigned
 
-        for idx, task in enumerate(data):
+        filtered_data = []
+        for task in data:
+            if self.current_role == "admin" or task.get("created_by") == self.current_user:
+                filtered_data.append(task)
+
+        for idx, task in enumerate(filtered_data):
             assigned_to_str = ", ".join(normalize_assigned_to(task))
             tree.insert("", "end", iid=idx, values=(
                 task.get("title", ""),
@@ -439,7 +451,7 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
             if selected:
                 idx = int(selected[0])
                 selected_index[0] = idx
-                task = data[idx]
+                task = filtered_data[idx]
 
                 entry_title.delete(0, tk.END)
                 entry_title.insert(0, task.get("title", ""))
@@ -487,6 +499,17 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
         fix_popup_position(entry_deadline)
 
         def save_update():
+            idx = selected_index[0]
+            if idx is None:
+                messagebox.showwarning("Chưa chọn", "Vui lòng chọn công việc để cập nhật.")
+                return
+
+            # Kiểm tra quyền cập nhật
+            task_owner = data[idx].get("created_by", "")
+            if self.current_role != "admin" and task_owner != self.current_user:
+                messagebox.showwarning("Không được phép", "Bạn chỉ có thể cập nhật công việc do bạn tạo.")
+                return
+
             idx = selected_index[0]
             if idx is None:
                 messagebox.showwarning("Chưa chọn", "Vui lòng chọn công việc để cập nhật.")
@@ -560,11 +583,26 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
             messagebox.showinfo("Thông báo", "Không có công việc nào để xóa.")
             return
 
-        if messagebox.askyesno("Xác nhận", "Bạn có chắc muốn xóa tất cả công việc không?"):
-            self.save_data([])
-            messagebox.showinfo("Thành công", "Đã xóa tất cả công việc.")
-            self.clear_display()
-            self.show_task_list([])
+        if self.current_role == "admin":
+            if messagebox.askyesno("Xác nhận", "Bạn có chắc muốn xóa tất cả công việc không?"):
+                self.save_data([])
+                messagebox.showinfo("Thành công", "Đã xóa tất cả công việc.")
+                self.clear_display()
+                self.show_task_list([])
+        else:
+            # User thường chỉ được xóa công việc họ tạo
+            user_tasks = [task for task in tasks if task.get("created_by", "") == self.current_user]
+            
+            if not user_tasks:
+                messagebox.showinfo("Thông báo", "Bạn không có công việc nào để xóa.")
+                return
+
+            if messagebox.askyesno("Xác nhận", "Bạn có chắc muốn xóa tất cả công việc do bạn tạo không?"):
+                remaining_tasks = [task for task in tasks if task.get("created_by", "") != self.current_user]
+                self.save_data(remaining_tasks)
+                messagebox.showinfo("Thành công", "Đã xóa tất cả công việc của bạn.")
+                self.clear_display()
+                self.show_task_list(remaining_tasks)
 
     def search_tasks(self):
         keyword = self.search_title_entry.get().lower().strip()
