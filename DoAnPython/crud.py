@@ -505,7 +505,9 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
                 return
 
             # Kiểm tra quyền cập nhật
-            task_owner = data[idx].get("created_by", "")
+            task_to_update = filtered_data[idx]
+            task_owner = task_to_update.get("created_by", "")
+
             if self.current_role != "admin" and task_owner != self.current_user:
                 messagebox.showwarning("Không được phép", "Bạn chỉ có thể cập nhật công việc do bạn tạo.")
                 return
@@ -546,9 +548,21 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
 
             # Kiểm tra trùng tên task (loại trừ chính task đang sửa)
             title_normalized = title.strip().lower()
-            current_creator = data[idx].get("created_by", self.current_user)
+            original_index = None
+            for i, t in enumerate(data):
+                if (t.get("title") == task_to_update.get("title") and
+                    t.get("created_by") == task_to_update.get("created_by")):
+                    original_index = i
+                    break
 
-            if any(i != idx and 
+            if original_index is None:
+                messagebox.showerror("Lỗi", "Không tìm thấy công việc gốc để cập nhật.")
+                return
+
+            current_creator = data[original_index].get("created_by", self.current_user)
+
+            # Kiểm tra trùng tiêu đề trong data (loại trừ task đang sửa)
+            if any(i != original_index and 
                 t.get("title", "").strip().lower() == title_normalized and 
                 t.get("created_by", "") == current_creator
                 for i, t in enumerate(data)):
@@ -567,7 +581,7 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
                 "created_by": current_creator
             }
 
-            data[idx] = updated_task
+            data[original_index] = updated_task
             self.save_data(data)
             messagebox.showinfo("Thành công", "Cập nhật công việc thành công!")
 
