@@ -237,6 +237,28 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
 
         tk.Button(window_create, text="Lưu", command=save_new_task).pack(pady=10)
 
+    def filter_tasks_for_user(self, tasks):
+        filtered = []
+        user_normalized = self.current_user.strip().lower()
+
+        for task in tasks:
+            # Normalize created_by
+            created_by = task.get("created_by", "").strip().lower()
+
+            # Normalize assigned_to
+            assigned = task.get("assigned_to", [])
+            if isinstance(assigned, str):
+                assigned = [assigned.strip().lower()]
+            elif isinstance(assigned, list):
+                assigned = [str(u).strip().lower() for u in assigned if isinstance(u, str)]
+            else:
+                assigned = []
+
+            if self.current_role == "admin" or created_by == user_normalized or user_normalized in assigned:
+                filtered.append(task)
+
+        return filtered
+
     def show_task_list(self, tasks):
         if not self.display_frame:
             return
@@ -271,7 +293,8 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
             for item in self.task_tree.get_children():
                 self.task_tree.delete(item)
 
-        for task in tasks:
+        filtered_tasks = self.filter_tasks_for_user(tasks)
+        for task in filtered_tasks:
             assigned_to_str = ", ".join(task.get("assigned_to", [])) if isinstance(task.get("assigned_to"), list) else task.get("assigned_to", "")
 
             if "created_by" not in task:
@@ -386,10 +409,7 @@ class BuildCrud (JSONHandler, ShowUser, CheckData, GetApi):
                 assigned = []
             return assigned
 
-        filtered_data = []
-        for task in data:
-            if self.current_role == "admin" or task.get("created_by") == self.current_user:
-                filtered_data.append(task)
+        filtered_data = self.filter_tasks_for_user(data)
 
         for idx, task in enumerate(filtered_data):
             assigned_to_str = ", ".join(normalize_assigned_to(task))

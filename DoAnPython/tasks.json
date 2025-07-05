@@ -128,8 +128,8 @@
     {
         "title": "âsss",
         "description": "ssss",
-        "start_date": "11-06-2025",
-        "deadline": "11-06-2025",
+        "start_date": "05-07-2025",
+        "deadline": "01-08-2025",
         "priority": "Trung bình",
         "status": "Đang làm",
         "category": "Học tập",
@@ -137,5 +137,18 @@
             "khang"
         ],
         "created_by": "khang"
+    },
+    {
+        "title": "sssas",
+        "description": "sâdđâ",
+        "start_date": "05-07-2025",
+        "deadline": "01-08-2025",
+        "priority": "Cao",
+        "status": "Đang làm",
+        "category": "Cá nhân",
+        "assigned_to": [
+            "khangg"
+        ],
+        "created_by": "khangg"
     }
 ]
